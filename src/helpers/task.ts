@@ -76,10 +76,39 @@ async function modifyTask(taskRequest: Task, user: User): Promise<Task> {
     return task;
 }
 
+async function queryTasks(query): Promise<mongooseDocument[]> {
+    const comparators: string[] = ['$eq', '$gt', '$gte', '$lt', '$lte', '$ne', '$in', '$nin']
+    const fields: string[] = ['_id', 'created_by', 'assignee', 'last_modified_by', 'title', 'status', 'created_at', 'last_modified_at', 'eta_done']
+    const db_query = {}
+    fields.forEach((field: string) => {
+        comparators.forEach((comparator: string) => {
+            const param: string = field + '_' + comparator;
+            let value = query[param];
+            if (!value) return;
+            if (comparator === '$in' || comparator === '$nin') {
+                value = value.split(',');
+            }
+            if (field === 'created_at' || field === 'last_modified_at' || field === 'eta_done') {
+                if (comparator === '$in' || comparator === '$nin') {
+                    value = value.map((val: string) => new Date(val));
+                } else {
+                    value = new Date(value)
+                }
+            }
+            if (!db_query[field]) {
+                db_query[field] = {};
+            }
+            db_query[field][comparator] = value
+        });
+    });
+    const results: mongooseDocument[] = await TaskModel.find(db_query);
+    return results
+}
 
 export {
     fetchTaskById,
     createTask,
     modifyTask,
-    deleteTaskFromCache
+    deleteTaskFromCache,
+    queryTasks
 }

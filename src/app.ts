@@ -5,6 +5,7 @@ import { connectMongo } from './connections/mongo';
 import { redisClient } from './connections/redis';
 import { userRouter } from './routes/user';
 import { taskRouter } from './routes/task';
+import { tasksRouter } from './routes/tasks';
 import { getAccessToken } from './helpers/token';
 
 const app: express.Express = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use('/user', userRouter);
 app.use('/task', taskRouter);
+app.use('/tasks', tasksRouter);
 
 app.post('/login', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
     const username: string = req.body.username;
