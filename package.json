@@ -1,0 +1,33 @@
+{
+  "scripts": {
+    "node-server": "npm i && tsc && node dist/src/app.js",
+    "lint": "eslint . --ext .ts"
+  },
+  "name": "slack-enablement-2-node",
+  "version": "1.0.0",
+  "main": "dist/app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KoupendraDB/Slack-Enablement-2-Node.js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KoupendraDB/Slack-Enablement-2-Node.js/issues"
+  },
+  "homepage": "https://github.com/KoupendraDB/Slack-Enablement-2-Node.js#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "mongoose": "^8.2.2",
+    "redis": "^4.6.13"
+  }
+}
