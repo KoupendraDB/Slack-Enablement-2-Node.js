@@ -1,6 +1,5 @@
-import { UserModel, User } from '../models/user';
+import { UserModel, User, mongooseDocument } from '../models/user';
 import { redisClient } from '../connections/redis';
-import { Document } from 'mongoose';
 
 async function fetchUserFromCache(userId: string): Promise<unknown> {
     const key = 'user_id:' + userId;
@@ -9,7 +8,8 @@ async function fetchUserFromCache(userId: string): Promise<unknown> {
 }
 
 async function setUserInCache(userId: string, user): Promise<void> {
-    await redisClient.json.set(userId, '$', user);
+    const key = 'user_id:' + userId;
+    await redisClient.json.set(key, '$', user);
     await redisClient.expire(userId, 60);
 }
 
@@ -19,12 +19,14 @@ async function fetchUserById(userId: string): Promise<unknown> {
         return cacheData;
     }
     const user: User = await UserModel.findById(userId, {'_id': 0, 'password': 0});
-    setUserInCache(userId, user);
+    if (user) {
+        setUserInCache(userId, user);
+    }
     return user
 }
 
-async function fetchUserByUsername(username: string): Promise<Document> {
-    const user: Document = await UserModel.findOne({username: username});
+async function fetchUserByUsername(username: string): Promise<mongooseDocument> {
+    const user: mongooseDocument = await UserModel.findOne({username: username});
     if (user) {
         setUserInCache(user._id.toString(), user);
     }

@@ -13,4 +13,18 @@ const TaskSchema: mongoose.Schema = new mongoose.Schema({
     collection: 'task'  
 });
 
-module.exports = mongoose.model('Task', TaskSchema);
+const TaskModel = mongoose.model('TaskModel', TaskSchema);
+interface Task {
+  last_modified_by?: string,
+  last_modified_at?: Date,
+  created_by?: string,
+  created_at?: Date,
+  assignee?: string,
+  title?: string,
+  status?: string,
+  eta_done?: Date
+}
+
+type mongooseDocument = mongoose.Document
+
+export { Task, TaskModel, mongooseDocument}

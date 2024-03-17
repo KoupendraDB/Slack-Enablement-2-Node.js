@@ -8,8 +8,8 @@ const UserSchema: mongoose.Schema = new mongoose.Schema({
 });
 
 interface User {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 }
 
 const UserModel = mongoose.model('User', UserSchema)
