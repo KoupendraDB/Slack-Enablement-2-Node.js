@@ -12,7 +12,7 @@ interface UserRequest extends Request {
 
 taskRouter.get('/:taskId', tokenRequired, async function(req: Request, res: Response, next: NextFunction) {
     const taskId: string = req.params.taskId;
-    const task: unknown = await fetchTaskById(taskId);
+    const task: mongooseDocument = await fetchTaskById(taskId);
     if (task) {
         res.send({
             success: true,
@@ -77,6 +77,32 @@ taskRouter.patch('/:taskId', tokenRequired, async function(req: UserRequest, res
         res.status(400).send({
             success: false,
             message: 'Invalid data!'
+        });
+    }
+    next();
+});
+
+taskRouter.delete('/:taskId', tokenRequired, async function(req: UserRequest, res: Response, next: NextFunction) {
+    const taskId: string = req.params.taskId;
+    const task: Task = <Task> await fetchTaskById(taskId);
+    if (task) {
+        if (task.created_by !== req.user.username) {
+            res.status(403);
+            res.send({
+                success: false,
+                message: 'Only creator of task can delete the task!'
+            });
+            return next();
+        }
+        await TaskModel.deleteOne({ _id: taskId });
+        deleteTaskFromCache(taskId);
+        res.send({
+            success: true,
+        });
+    } else {
+        res.status(404);
+        res.send({
+            success: false,
         });
     }
     next();
