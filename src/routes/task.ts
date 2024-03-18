@@ -35,7 +35,7 @@ taskRouter.post('/', tokenRequired, async function(req: UserRequest, res: Respon
     if (!task) {
         res.status(StatusCodes.BadRequest).send({
             success: false,
-            message: 'Invalid assignee!'
+            message: 'Invalid data!'
         });
         return next();
     }
