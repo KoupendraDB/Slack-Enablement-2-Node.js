@@ -9,7 +9,7 @@ async function getAccessToken(username: string, password: string): Promise<strin
         return jwt.sign(
             { userId: user._id.toString() },
             process.env[config.app_secret_key_variable],
-            { expiresIn: "1h" }
+            { expiresIn: "1h", algorithm: 'HS256' }
         );
     }
     return;
