@@ -2,6 +2,7 @@ import { TaskModel, Task, TaskDocument } from '../models/task';
 import { User } from '../models/user';
 import { redisClient } from '../connections/redis';
 import { fetchUserByUsername } from './user';
+import { TaskStatus, DefaultTaskStatus } from '../constants';
 
 async function fetchTaskFromCache(taskId: string): Promise<TaskDocument> {
     const key: string = 'task_id:' + taskId;
@@ -42,6 +43,15 @@ async function createTask(taskRequest: Task, user: User): Promise<TaskDocument> 
         created_at: new Date(),
         created_by: user.username
     };
+    if (taskRequest.status) {
+        if (TaskStatus.includes(taskRequest.status)) {
+            task.status = taskRequest.status;
+        } else {
+            return;
+        }
+    } else {
+        task.status = DefaultTaskStatus;
+    }
     if (taskRequest.assignee) {
         if (await fetchUserByUsername(taskRequest.assignee)) {
             task.assignee = taskRequest.assignee;

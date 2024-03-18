@@ -1,5 +1,6 @@
 import { decodeAccessToken } from './token';
 import { User } from '../models/user';
+import { StatusCodes } from '../constants';
 
 
 async function tokenRequired(req, res, next) {
@@ -10,12 +11,12 @@ async function tokenRequired(req, res, next) {
             req.user = user;
             next();
         } else {
-            res.status(401).send({
+            res.status(StatusCodes.Unauthorized).send({
                 message: 'Invalid bearer token!'
             });
         }
     } else {
-        res.status(404).send({
+        res.status(StatusCodes.Unauthorized).send({
             message: 'Bearer token missing!'
         });
     }

@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { User, UserModel, UserDocument } from '../models/user';
 import { fetchUserById } from '../helpers/user';
+import { StatusCodes } from '../constants';
 
 const userRouter: Router = Router();
 
@@ -13,7 +14,7 @@ userRouter.get('/:userId', async function(req: Request, res: Response, next: Nex
             user: user
         })
     } else {
-        res.status(404);
+        res.status(StatusCodes.NotFound);
         res.send({
             success: false,
         });
@@ -27,7 +28,7 @@ userRouter.post('/', async function(req: Request, res: Response, next: NextFunct
     try {
         const newUser: UserDocument = await user.save();
         if (newUser !== user) {
-            res.status(409).send({
+            res.status(StatusCodes.Conflict).send({
                 success: false,
                 message: 'Username already exists!'
             });
@@ -38,7 +39,7 @@ userRouter.post('/', async function(req: Request, res: Response, next: NextFunct
             });
         }
     } catch {
-        res.status(404).send({
+        res.status(StatusCodes.Conflict).send({
             success: false,
             message: 'Username already exists!'
         });

@@ -4,6 +4,7 @@ import { User } from '../models/user';
 import { Task, TaskModel, TaskDocument } from '../models/task';
 import { tokenRequired } from '../helpers/middleware';
 import { fetchTaskById, createTask, modifyTask, deleteTaskFromCache } from '../helpers/task';
+import { StatusCodes } from '../constants';
 
 const taskRouter: Router = Router();
 
@@ -20,7 +21,7 @@ taskRouter.get('/:taskId', tokenRequired, async function(req: Request, res: Resp
             task: task
         })
     } else {
-        res.status(404);
+        res.status(StatusCodes.NotFound);
         res.send({
             success: false,
         });
@@ -32,7 +33,7 @@ taskRouter.post('/', tokenRequired, async function(req: UserRequest, res: Respon
     const taskRequest: Task = req.body;
     const task: TaskDocument = await createTask(taskRequest, req.user);
     if (!task) {
-        res.status(400).send({
+        res.status(StatusCodes.BadRequest).send({
             success: false,
             message: 'Invalid assignee!'
         });
@@ -45,7 +46,7 @@ taskRouter.post('/', tokenRequired, async function(req: UserRequest, res: Respon
             task_id: newTask._id.toString()
         });
     } catch (error) {
-        res.status(400).send({
+        res.status(StatusCodes.BadRequest).send({
             success: false,
             message: 'Invalid data!'
         });
@@ -58,7 +59,7 @@ taskRouter.patch('/:taskId', tokenRequired, async function(req: UserRequest, res
     const taskRequest: Task = req.body;
     const task: Task = await modifyTask(taskRequest, req.user);
     if (!task) {
-        res.status(400).send({
+        res.status(StatusCodes.BadRequest).send({
             success: false,
             message: 'Invalid assignee!'
         });
@@ -75,7 +76,7 @@ taskRouter.patch('/:taskId', tokenRequired, async function(req: UserRequest, res
             throw new Error('Invalid task')
         }
     } catch (error) {
-        res.status(400).send({
+        res.status(StatusCodes.BadRequest).send({
             success: false,
             message: 'Invalid data!'
         });
@@ -88,7 +89,7 @@ taskRouter.delete('/:taskId', tokenRequired, async function(req: UserRequest, re
     const task: Task = <Task> await fetchTaskById(taskId);
     if (task) {
         if (task.created_by !== req.user.username) {
-            res.status(403);
+            res.status(StatusCodes.Forbidden);
             res.send({
                 success: false,
                 message: 'Only creator of task can delete the task!'
@@ -101,7 +102,7 @@ taskRouter.delete('/:taskId', tokenRequired, async function(req: UserRequest, re
             success: true,
         });
     } else {
-        res.status(404);
+        res.status(StatusCodes.NotFound);
         res.send({
             success: false,
         });
