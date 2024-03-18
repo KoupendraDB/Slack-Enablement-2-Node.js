@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { User, UserModel, mongooseDocument } from '../models/user';
+import { User, UserModel, UserDocument } from '../models/user';
 import { fetchUserById } from '../helpers/user';
 
 const userRouter: Router = Router();
@@ -23,9 +23,9 @@ userRouter.get('/:userId', async function(req: Request, res: Response, next: Nex
 
 userRouter.post('/', async function(req: Request, res: Response, next: NextFunction) {
     const userRequest: User = req.body;
-    const user: mongooseDocument = new UserModel(userRequest);
+    const user: UserDocument = new UserModel(userRequest);
     try {
-        const newUser = await user.save();
+        const newUser: UserDocument = await user.save();
         if (newUser !== user) {
             res.status(409).send({
                 success: false,

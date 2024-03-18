@@ -1,38 +1,38 @@
-import { TaskModel, Task, mongooseDocument } from '../models/task';
+import { TaskModel, Task, TaskDocument } from '../models/task';
 import { User } from '../models/user';
 import { redisClient } from '../connections/redis';
 import { fetchUserByUsername } from './user';
 
-async function fetchTaskFromCache(taskId: string): Promise<unknown> {
-    const key = 'task_id:' + taskId;
-    const data = await redisClient.json.get(key);
+async function fetchTaskFromCache(taskId: string): Promise<TaskDocument> {
+    const key: string = 'task_id:' + taskId;
+    const data: TaskDocument = <TaskDocument><unknown> await redisClient.json.get(key);
     return data;
 }
 
 async function setTaskInCache(taskId: string, task): Promise<void> {
-    const key = 'task_id:' + taskId;
+    const key: string = 'task_id:' + taskId;
     await redisClient.json.set(key, '$', task);
     redisClient.expire(taskId, 30*60);
 }
 
 async function deleteTaskFromCache(taskId: string): Promise<void> {
-    const key = 'task_id:' + taskId;
+    const key: string = 'task_id:' + taskId;
     redisClient.del(key);
 }
 
-async function fetchTaskById(taskId: string): Promise<mongooseDocument> {
+async function fetchTaskById(taskId: string): Promise<TaskDocument> {
     const cacheData: unknown = await fetchTaskFromCache(taskId);
     if (cacheData) {
-        return <mongooseDocument>cacheData;
+        return <TaskDocument>cacheData;
     }
-    const task: mongooseDocument = await TaskModel.findById(taskId, {'_id': 0});
+    const task: TaskDocument = await TaskModel.findById(taskId, {'_id': 0});
     if (task) {
         setTaskInCache(taskId, task);
     }
     return task;
 }
 
-async function createTask(taskRequest: Task, user: User): Promise<mongooseDocument> {
+async function createTask(taskRequest: Task, user: User): Promise<TaskDocument> {
     const task: Task = {
         status: taskRequest.status || 'Ready',
         title: taskRequest.title,
@@ -76,7 +76,7 @@ async function modifyTask(taskRequest: Task, user: User): Promise<Task> {
     return task;
 }
 
-async function queryTasks(query): Promise<mongooseDocument[]> {
+async function queryTasks(query): Promise<TaskDocument[]> {
     const comparators: string[] = ['$eq', '$gt', '$gte', '$lt', '$lte', '$ne', '$in', '$nin']
     const fields: string[] = ['_id', 'created_by', 'assignee', 'last_modified_by', 'title', 'status', 'created_at', 'last_modified_at', 'eta_done']
     const db_query = {}
@@ -101,7 +101,7 @@ async function queryTasks(query): Promise<mongooseDocument[]> {
             db_query[field][comparator] = value
         });
     });
-    const results: mongooseDocument[] = await TaskModel.find(db_query);
+    const results: TaskDocument[] = await TaskModel.find(db_query);
     return results
 }
 

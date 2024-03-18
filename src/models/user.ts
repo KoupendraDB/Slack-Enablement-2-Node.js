@@ -14,6 +14,6 @@ interface User {
 
 const UserModel = mongoose.model('User', UserSchema)
 
-type mongooseDocument = mongoose.Document
+type UserDocument = mongoose.Document<User>;
 
-export { User, UserModel, mongooseDocument }
+export { User, UserModel, UserDocument }

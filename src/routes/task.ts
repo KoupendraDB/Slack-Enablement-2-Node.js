@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { UpdateWriteOpResult } from 'mongoose';
 import { User } from '../models/user';
-import { Task, TaskModel, mongooseDocument } from '../models/task';
+import { Task, TaskModel, TaskDocument } from '../models/task';
 import { tokenRequired } from '../helpers/middleware';
 import { fetchTaskById, createTask, modifyTask, deleteTaskFromCache } from '../helpers/task';
 
@@ -12,7 +13,7 @@ interface UserRequest extends Request {
 
 taskRouter.get('/:taskId', tokenRequired, async function(req: Request, res: Response, next: NextFunction) {
     const taskId: string = req.params.taskId;
-    const task: mongooseDocument = await fetchTaskById(taskId);
+    const task: TaskDocument = await fetchTaskById(taskId);
     if (task) {
         res.send({
             success: true,
@@ -29,7 +30,7 @@ taskRouter.get('/:taskId', tokenRequired, async function(req: Request, res: Resp
 
 taskRouter.post('/', tokenRequired, async function(req: UserRequest, res: Response, next: NextFunction) {
     const taskRequest: Task = req.body;
-    const task: mongooseDocument = await createTask(taskRequest, req.user);
+    const task: TaskDocument = await createTask(taskRequest, req.user);
     if (!task) {
         res.status(400).send({
             success: false,
@@ -64,7 +65,7 @@ taskRouter.patch('/:taskId', tokenRequired, async function(req: UserRequest, res
         return next();
     }
     try {
-        const updateResult = await TaskModel.updateOne({ _id: taskId }, task);
+        const updateResult: UpdateWriteOpResult = await TaskModel.updateOne({ _id: taskId }, task);
         if (updateResult.modifiedCount) {
             res.send({
                 success: true,

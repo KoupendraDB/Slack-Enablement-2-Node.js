@@ -25,6 +25,6 @@ interface Task {
   eta_done?: Date
 }
 
-type mongooseDocument = mongoose.Document
+type TaskDocument = mongoose.Document<Task>
 
-export { Task, TaskModel, mongooseDocument}
+export { Task, TaskModel, TaskDocument}

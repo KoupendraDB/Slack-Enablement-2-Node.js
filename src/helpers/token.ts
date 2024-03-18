@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
-import { UserModel, User, mongooseDocument } from '../models/user';
+import { UserModel, User, UserDocument } from '../models/user';
 import { fetchUserById } from './user';
 import * as config from '../../config.json';
 
 async function getAccessToken(username: string, password: string): Promise<string> {
-    const user: mongooseDocument = await UserModel.findOne({username: username, password: password})
+    const user: UserDocument = await UserModel.findOne({username: username, password: password})
     if (user) {
         return jwt.sign(
             { userId: user._id.toString() },

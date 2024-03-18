@@ -1,9 +1,11 @@
 import { decodeAccessToken } from './token';
+import { User } from '../models/user';
+
 
 async function tokenRequired(req, res, next) {
     const bearerToken: string = req.header('bearer-token');
     if (bearerToken) {
-        const user = await decodeAccessToken(bearerToken);
+        const user: User = await decodeAccessToken(bearerToken);
         if (user) {
             req.user = user;
             next();
