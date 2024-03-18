@@ -10,7 +10,7 @@
         "password_variable": "redis_password",
         "port": 12442
     },
-    "server_port": 3000,
+    "server_port": 5000,
     "app_secret_key_variable": "app_secret_key",
     "enable_password_hashing": false
 }
